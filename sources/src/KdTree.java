@@ -20,10 +20,16 @@ public class KdTree {
     }
 
     public void insert(Point2D p) {
-
+        if (p == null) {
+            throw new java.lang.IllegalArgumentException();
+        }
     }
 
     public boolean contains(Point2D p) {
+        if (p == null) {
+            throw new java.lang.IllegalArgumentException();
+        }
+
         return false;
     }
 
@@ -31,12 +37,23 @@ public class KdTree {
 
     }
 
-    public Iterable<Point2D> range(RectHV rect) {
+//    public Iterable<Point2D> range(RectHV rect) {
+//        if (rect == null) {
+//            throw new java.lang.IllegalArgumentException();
+//        }
+//
+//    }
 
-    }
+    public Point2D nearest(Point2D p) {
+        if (p == null) {
+            throw new java.lang.IllegalArgumentException();
+        }
 
-    public Point2D nearest(Point2D p){
-        return new Point2D(0, 0);
+        if (size() == 0) {
+            return null;
+        }
+
+        return new Point2D(0,0);
     }
 
     public static void main(String[] args) {}
