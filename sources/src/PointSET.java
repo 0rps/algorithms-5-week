@@ -33,8 +33,9 @@ public class PointSET {
         if (p == null) {
             throw new java.lang.IllegalArgumentException();
         }
-
-        storage.add(p);
+        if (!contains(p)) {
+            storage.add(p);
+        }
     }
 
     public boolean contains(Point2D p) {
