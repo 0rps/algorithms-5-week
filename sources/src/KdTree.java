@@ -13,24 +13,24 @@ public class KdTree {
     private class Node implements Comparable<Point2D> {
 
         private Point2D point;
-        private boolean isHorizontal;
+        private boolean isVertical;
         private int maxX;
 
         private Node parent = null;
         private Node left;
         private Node right;
 
-        private Node(Point2D point, boolean isHorizontal) {
+        private Node(Point2D point, boolean isVertical) {
 
             this.point = point;
-            this.isHorizontal = isHorizontal;
+            this.isVertical = isVertical;
         }
 
         @Override
         public int compareTo(Point2D other) {
             double a;
             double b;
-            if (isHorizontal) {
+            if (isVertical) {
                 a = point.x();
                 b = other.x();
             } else {
@@ -57,11 +57,11 @@ public class KdTree {
 
         private Node addChild(Point2D point) {
             if (this.compareTo(point) > 0) {
-                left = new Node(point, !isHorizontal);
+                left = new Node(point, !isVertical);
                 left.parent = this;
                 return left;
             } else {
-                right = new Node(point, !isHorizontal);
+                right = new Node(point, !isVertical);
                 right.parent = this;
                 return right;
             }
@@ -78,7 +78,7 @@ public class KdTree {
     }
 
     public int size() {
-        return 0;
+        return count;
     }
 
     public void insert(Point2D p) {
@@ -95,7 +95,6 @@ public class KdTree {
             return;
         }
 
-        root.addChild(p);
         Node parent = root;
         Node currentNode = root;
         while(currentNode != null) {
@@ -106,6 +105,7 @@ public class KdTree {
         /// update parent maxX
 
         parent.addChild(p);
+        count++;
 
     }
 
@@ -150,8 +150,40 @@ public class KdTree {
             throw new java.lang.IllegalArgumentException();
         }
 
-        ArrayList<Point2D> points = null;
+        ArrayList<Point2D> points = new ArrayList<>();
+        range(rect, root, points);
         return points;
+    }
+
+    private void range(RectHV rect, Node node, ArrayList<Point2D> result) {
+        if (node == null) {
+            return;
+        }
+
+        if (rect.contains(node.point)) {
+            result.add(node.point);
+        }
+
+        double value;
+        double a,b;
+
+        if (node.isVertical) {
+            a = rect.xmin();
+            b = rect.xmax();
+            value = node.point.x();
+        } else {
+            a = rect.ymin();
+            b = rect.ymax();
+            value = node.point.y();
+        }
+
+        if (value <= b) {
+            range(rect, node.left, result);
+        }
+
+        if (value >= a) {
+            range(rect, node.right, result);
+        }
     }
 
     public Point2D nearest(Point2D p) {
