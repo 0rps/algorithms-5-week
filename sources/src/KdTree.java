@@ -2,7 +2,11 @@
  * Created by orps on 24.07.17.
  */
 
-import edu.princeton.cs.algs4.*;
+import edu.princeton.cs.algs4.StdDraw;
+import edu.princeton.cs.algs4.Point2D;
+import edu.princeton.cs.algs4.RectHV;
+import edu.princeton.cs.algs4.In;
+// import edu.princeton.cs.algs4.StdOut;
 
 import java.util.ArrayList;
 
@@ -10,11 +14,10 @@ public class KdTree {
 
     private class Node implements Comparable<Point2D> {
 
-        private Point2D point;
-        private boolean isVertical;
-        private int maxX;
+        private final Point2D point;
+        private final boolean isVertical;
 
-        private Node parent = null;
+//        private Node parent = null;
         private Node left;
         private Node right;
 
@@ -56,11 +59,11 @@ public class KdTree {
         private Node addChild(Point2D point) {
             if (this.compareTo(point) > 0) {
                 left = new Node(point, !isVertical);
-                left.parent = this;
+                // left.parent = this;
                 return left;
             } else {
                 right = new Node(point, !isVertical);
-                right.parent = this;
+                // right.parent = this;
                 return right;
             }
         }
@@ -101,11 +104,8 @@ public class KdTree {
             currentNode = currentNode.nodeToInsert(p);
         }
 
-        /// update parent maxX
-
         parent.addChild(p);
         count++;
-
     }
 
     public boolean contains(Point2D p) {
@@ -132,40 +132,40 @@ public class KdTree {
         return false;
     }
 
-    public void check() {
-        check(root);
-    }
-    private void check(Node node) {
-        if (node == null) {
-            return;
-        }
-
-        if (node.left != null) {
-            if (node.isVertical) {
-                if (node.point.x() < node.left.point.x()) {
-                    StdOut.println("Wrong: left is higher than node: " + node.point.x() + ", " + node.point.x());
-                }
-            } else {
-                if (node.point.y() < node.left.point.y()) {
-                    StdOut.println("Wrong: left is higher than node: " + node.point.x() + ", " + node.point.x());
-                }
-            }
-            check(node.left);
-        }
-
-        if (node.right != null) {
-            if (node.isVertical) {
-                if (node.point.x() > node.right.point.x()) {
-                    StdOut.println("Wrong: right is lower than node: " + node.point.x() + ", " + node.point.x());
-                }
-            } else {
-                if (node.point.y() > node.right.point.y()) {
-                    StdOut.println("Wrong: right is lower than node: " + node.point.x() + ", " + node.point.x());
-                }
-            }
-            check(node.right);
-        }
-    }
+//    public void check() {
+//        check(root);
+//    }
+//    private void check(Node node) {
+//        if (node == null) {
+//            return;
+//        }
+//
+//        if (node.left != null) {
+//            if (node.isVertical) {
+//                if (node.point.x() < node.left.point.x()) {
+//                    StdOut.println("Wrong: left is higher than node: " + node.point.x() + ", " + node.point.x());
+//                }
+//            } else {
+//                if (node.point.y() < node.left.point.y()) {
+//                    StdOut.println("Wrong: left is higher than node: " + node.point.x() + ", " + node.point.x());
+//                }
+//            }
+//            check(node.left);
+//        }
+//
+//        if (node.right != null) {
+//            if (node.isVertical) {
+//                if (node.point.x() > node.right.point.x()) {
+//                    StdOut.println("Wrong: right is lower than node: " + node.point.x() + ", " + node.point.x());
+//                }
+//            } else {
+//                if (node.point.y() > node.right.point.y()) {
+//                    StdOut.println("Wrong: right is lower than node: " + node.point.x() + ", " + node.point.x());
+//                }
+//            }
+//            check(node.right);
+//        }
+//    }
 
     public void draw() {
         if (root != null) {
@@ -174,9 +174,7 @@ public class KdTree {
     }
 
     private void draw(Node node) {
-        ///StdOut.println(" " + node.point.x() + ", " + node.point.x());
         StdDraw.point(node.point.x(), node.point.y());
-        // StdDraw.pause(3000);
         if (node.left != null) { draw(node.left); }
         if (node.right != null ) { draw(node.right); }
     }
