@@ -5,14 +5,19 @@
 import edu.princeton.cs.algs4.StdDraw;
 import edu.princeton.cs.algs4.Point2D;
 import edu.princeton.cs.algs4.RectHV;
-import edu.princeton.cs.algs4.In;
+// import edu.princeton.cs.algs4.StdOut;
+// import edu.princeton.cs.algs4.In;
 // import edu.princeton.cs.algs4.StdOut;
 
 import java.util.ArrayList;
 
 public class KdTree {
 
-    private class Node implements Comparable<Point2D> {
+    private int count = 0;
+    private Node root = null;
+    private Point2D nPoint = null;
+
+    private class Node {
 
         private final Point2D point;
         private final boolean isVertical;
@@ -27,7 +32,6 @@ public class KdTree {
             this.isVertical = isVertical;
         }
 
-        @Override
         public int compareTo(Point2D other) {
             double a;
             double b;
@@ -48,30 +52,26 @@ public class KdTree {
             return 0;
         }
 
-        private Node nodeToInsert(Point2D point) {
-            if (this.compareTo(point) > 0) {
+        private Node nodeToInsert(Point2D p) {
+            if (this.compareTo(p) > 0) {
                 return left;
             } else {
                 return right;
             }
         }
 
-        private Node addChild(Point2D point) {
-            if (this.compareTo(point) > 0) {
-                left = new Node(point, !isVertical);
+        private Node addChild(Point2D p) {
+            if (this.compareTo(p) > 0) {
+                left = new Node(p, !isVertical);
                 // left.parent = this;
                 return left;
             } else {
-                right = new Node(point, !isVertical);
+                right = new Node(p, !isVertical);
                 // right.parent = this;
                 return right;
             }
         }
     }
-
-    private int count = 0;
-    private Node root = null;
-    private Point2D nPoint = null;
 
     public KdTree() { }
 
@@ -90,6 +90,7 @@ public class KdTree {
 
         if (root == null) {
             root = new Node(p, true);
+            count++;
             return;
         }
 
@@ -99,7 +100,7 @@ public class KdTree {
 
         Node parent = root;
         Node currentNode = root;
-        while(currentNode != null) {
+        while (currentNode != null) {
             parent = currentNode;
             currentNode = currentNode.nodeToInsert(p);
         }
@@ -118,14 +119,17 @@ public class KdTree {
         }
 
         Node nextNode = root;
-        while(nextNode != null) {
+        while (nextNode != null) {
             final int compare = nextNode.compareTo(p);
-            if (compare < 0) {
-                nextNode = nextNode.left;
-            } else if (compare > 0) {
-                nextNode = nextNode.right;
-            } else {
+
+            if (nextNode.point.equals(p)) {
                 return true;
+            }
+
+            if (compare > 0) {
+                nextNode = nextNode.left;
+            } else {
+                nextNode = nextNode.right;
             }
         }
 
@@ -139,7 +143,6 @@ public class KdTree {
 //        if (node == null) {
 //            return;
 //        }
-//
 //        if (node.left != null) {
 //            if (node.isVertical) {
 //                if (node.point.x() < node.left.point.x()) {
@@ -152,7 +155,6 @@ public class KdTree {
 //            }
 //            check(node.left);
 //        }
-//
 //        if (node.right != null) {
 //            if (node.isVertical) {
 //                if (node.point.x() > node.right.point.x()) {
@@ -176,7 +178,7 @@ public class KdTree {
     private void draw(Node node) {
         StdDraw.point(node.point.x(), node.point.y());
         if (node.left != null) { draw(node.left); }
-        if (node.right != null ) { draw(node.right); }
+        if (node.right != null) { draw(node.right); }
     }
 
     public Iterable<Point2D> range(RectHV rect) {
@@ -194,12 +196,16 @@ public class KdTree {
             return;
         }
 
+        if (rect.width() > 0) {
+            int a  = 0;
+        }
+
         if (rect.contains(node.point)) {
             result.add(node.point);
         }
 
         double value;
-        double a,b;
+        double a, b;
 
         if (node.isVertical) {
             a = rect.xmin();
@@ -212,11 +218,11 @@ public class KdTree {
         }
 
         if (value <= b) {
-            range(rect, node.left, result);
+            range(rect, node.right, result);
         }
 
         if (value >= a) {
-            range(rect, node.right, result);
+            range(rect, node.left, result);
         }
     }
 
@@ -274,50 +280,41 @@ public class KdTree {
         }
     }
 
-    public static void main(String[] args) {
-        String filename = args[0];
-        In in = new In(filename);
-
-        StdDraw.enableDoubleBuffering();
-
-        // initialize the two data structures with point from standard input
-        KdTree brute = new KdTree();
-        //KdTree kdtree = new KdTree();
-        while (!in.isEmpty()) {
-            double x = in.readDouble();
-            double y = in.readDouble();
-            Point2D p = new Point2D(x, y);
-            //kdtree.insert(p);
-            brute.insert(p);
-        }
-
-        //brute.check();
-
-        while (true) {
-
-            // the location (x, y) of the mouse
-            double x = StdDraw.mouseX();
-            double y = StdDraw.mouseY();
-            Point2D query = new Point2D(x, y);
-
-            // draw all of the points
-            StdDraw.clear();
-            StdDraw.setPenColor(StdDraw.BLACK);
-            StdDraw.setPenRadius(0.01);
-            brute.draw();
-
-            // draw in red the nearest neighbor (using brute-force algorithm)
-            StdDraw.setPenRadius(0.02);
-            StdDraw.setPenColor(StdDraw.RED);
-            brute.nearest(query).draw();
-            StdDraw.setPenRadius(0.02);
-
-            // draw in blue the nearest neighbor (using kd-tree algorithm)
-            StdDraw.setPenColor(StdDraw.BLUE);
-            //kdtree.nearest(query).draw();
-            StdDraw.show();
-
-            StdDraw.pause(50);
-        }
-    }
+//    public static void main(String[] args) {
+//        String filename = args[0];
+//        In in = new In(filename);
+//        StdDraw.enableDoubleBuffering();
+//        // initialize the two data structures with point from standard input
+//        KdTree brute = new KdTree();
+//        //KdTree kdtree = new KdTree();
+//        while (!in.isEmpty()) {
+//            double x = in.readDouble();
+//            double y = in.readDouble();
+//            Point2D p = new Point2D(x, y);
+//            //kdtree.insert(p);
+//            brute.insert(p);
+//        }
+//        //brute.check();
+//        while (true) {
+//            // the location (x, y) of the mouse
+//            double x = StdDraw.mouseX();
+//            double y = StdDraw.mouseY();
+//            Point2D query = new Point2D(x, y);
+//            // draw all of the points
+//            StdDraw.clear();
+//            StdDraw.setPenColor(StdDraw.BLACK);
+//            StdDraw.setPenRadius(0.01);
+//            brute.draw();
+//            // draw in red the nearest neighbor (using brute-force algorithm)
+//            StdDraw.setPenRadius(0.02);
+//            StdDraw.setPenColor(StdDraw.RED);
+//            brute.nearest(query).draw();
+//            StdDraw.setPenRadius(0.02);
+//            // draw in blue the nearest neighbor (using kd-tree algorithm)
+//            StdDraw.setPenColor(StdDraw.BLUE);
+//            //kdtree.nearest(query).draw();
+//            StdDraw.show();
+//            StdDraw.pause(50);
+//        }
+//    }
 }
